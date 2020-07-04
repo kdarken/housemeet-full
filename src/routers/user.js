@@ -7,7 +7,7 @@ const router = express.Router()
 let bodyParser =  require('body-parser');
 router.use(bodyParser.json());
 
-router.post('/signup', async (req, res) => {
+router.post('/users/signup', async (req, res) => {
     // Create a new user
     try {
         console.log(req.body);
@@ -23,6 +23,7 @@ router.post('/signup', async (req, res) => {
 router.post('/users/login', async(req, res) => {
     //Login a registered user
     try {
+        console.log(req.body);
         const { email, password } = req.body
         const user = await User.findByCredentials(email, password)
         if (!user) {
