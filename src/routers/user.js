@@ -4,9 +4,6 @@ const User = require('../models/User')
 
 const router = express.Router()
 
-let bodyParser =  require('body-parser');
-router.use(bodyParser.json());
-
 router.post('/users/signup', async (req, res) => {
     // Create a new user
     try {
