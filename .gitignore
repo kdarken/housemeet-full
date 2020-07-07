@@ -4,3 +4,7 @@
 # misc
 .DS_Store
 housemeet-ui/
+.env
+.env.example
+.env.local
+.env.staging
