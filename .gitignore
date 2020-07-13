@@ -8,3 +8,4 @@ housemeet-ui/
 .env.example
 .env.local
 .env.staging
+yarn.lock
