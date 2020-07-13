@@ -1,6 +1,7 @@
 const express = require('express')
 const port = process.env.PORT
 const userRouter = require('./routers/user')
+const profileRouter = require('./routers/profile') 
 var bodyParser = require('body-parser')
 require('./db/db')
 
@@ -10,6 +11,7 @@ app.use(bodyParser.json());
 
 app.use(express.json())
 app.use(userRouter)
+app.use(profileRouter)
 
 app.use(bodyParser.urlencoded({extended: false}));
 

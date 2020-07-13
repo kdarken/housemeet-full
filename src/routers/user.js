@@ -13,6 +13,7 @@ router.post('/users/signup', async (req, res) => {
         const token = await user.generateAuthToken()
         res.status(201).send({ user, token })
     } catch (error) {
+        console.log("error")
         res.status(400).send(error)
     }
 })
@@ -32,11 +33,6 @@ router.post('/users/login', async(req, res) => {
         res.status(400).send(error)
     }
 
-})
-
-router.get('/users/me', auth, async(req, res) => {
-    // View logged in user profile
-    res.send(req.user)
 })
 
 router.post('/users/me/logout', auth, async (req, res) => {
