@@ -15,7 +15,7 @@ const basicProfileSchema = mongoose.Schema({
     trim: true,
   },
   dateOfBirth: {
-    type: Date,
+    type: String,
     required: true,
     trim: true,
   },
@@ -45,7 +45,7 @@ const basicProfileSchema = mongoose.Schema({
     trim: true,
   },
   budget: {
-    type: Number,
+    type: String,
     required: true,
     trim: true,
   },
