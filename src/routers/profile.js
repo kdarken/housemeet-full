@@ -15,7 +15,7 @@ router.post("/profiles/update/basic", async (req, res) => {
       lastName,
       dateOfBirth,
       lifeStyle,
-      roomateOrHousemate,
+      roommateOrHousemate,
       bio,
       currentCity,
       newCity,
@@ -23,16 +23,15 @@ router.post("/profiles/update/basic", async (req, res) => {
       email,
     } = req.body; //TODO fill in the foriegn inputs
 
-    let userProfile = await BasicProfile.find({ email: email });
-
+    let userProfile = await BasicProfile.findOne({ email });
     console.log(userProfile);
     if (!userProfile) {
       userProfile = new BasicProfile(req.body);
-      console.log("success");
-      await userProfile.save();
+      userProfile.save();
     } else {
       //TODO
     }
+    res.status(201).send();
   } catch (error) {
     console.log(error);
     res.status(400).send(error);

@@ -15,7 +15,7 @@ const basicProfileSchema = mongoose.Schema({
     trim: true,
   },
   dateOfBirth: {
-    type: String,
+    type: Date,
     required: true,
     trim: true,
   },
@@ -24,7 +24,7 @@ const basicProfileSchema = mongoose.Schema({
     required: true,
     trim: true,
   },
-  roomateOrHousemate: {
+  roommateOrHousemate: {
     type: String,
     required: true,
     trim: true,
@@ -45,7 +45,7 @@ const basicProfileSchema = mongoose.Schema({
     trim: true,
   },
   budget: {
-    type: String,
+    type: Number,
     required: true,
     trim: true,
   },
