@@ -5,7 +5,7 @@ const HabitsProfile = require("../models/HabitsProfile");
 
 const router = express.Router();
 
-router.post("/profiles/update/basic", auth, async (req, res) => {
+router.post("/profiles/update/basic", async (req, res) => {
   // Update user profile (basic information)
   try {
     console.log(req.body);
@@ -23,17 +23,18 @@ router.post("/profiles/update/basic", auth, async (req, res) => {
       email,
     } = req.body; //TODO fill in the foriegn inputs
 
-    let userProfile = db.user - basic - profiles.find({ email: email });
+    let userProfile = await BasicProfile.find({ email: email });
 
+    console.log(userProfile);
     if (!userProfile) {
       userProfile = new BasicProfile(req.body);
-      userProfile.save();
+      console.log("success");
+      await userProfile.save();
     } else {
       //TODO
     }
-    res.status(201).send({ user, token });
   } catch (error) {
-    console.log("error");
+    console.log(error);
     res.status(400).send(error);
   }
 });
