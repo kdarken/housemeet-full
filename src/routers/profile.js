@@ -40,17 +40,6 @@ router.post("/profiles/update/basic", async (req, res) => {
 
 
 router.post("/profiles/update/habits", auth, async (req, res) => {
-  // Update user profile (living habits)
-  try {
-    console.log(req.body);
-    const { email, otherInfo } = req.body; //TODO
-    const userProfile = db.user - habits - profiles.find({ email: email });
-    if (!userProfile) {
-      userProfile = new HabitsProfile(req.body);
-      //await userProfile.save()
-    } else {
-      //TODO
-router.post('/profiles/update/habits', async(req, res) => { //TODO: add auth, get auth to work
     // Update user profile (living habits)
     try {
         console.log(req.body);
@@ -61,14 +50,13 @@ router.post('/profiles/update/habits', async(req, res) => { //TODO: add auth, ge
             userProfile = new HabitsProfile(req.body)
             userProfile.save()
         } else {
-           //TODO
+            //TODO
         }
         res.status(201).send()
     } catch (error) {
         console.log(error)
         res.status(400).send(error)
     }
-    
 });
 
 router.get("/profiles/me", auth, async (req, res) => {
