@@ -1,21 +1,21 @@
-const express = require('express')
-const port = process.env.PORT
-const userRouter = require('./routers/user')
-const profileRouter = require('./routers/profile') 
-var bodyParser = require('body-parser')
-require('./db/db')
+const express = require("express");
+const port = process.env.PORT;
+const userRouter = require("./routers/user");
+const profileRouter = require("./routers/profile");
+var bodyParser = require("body-parser");
+require("./db/db");
 
-const app = express()
+const app = express();
+var fs = require("fs");
 
 app.use(bodyParser.json());
 
-app.use(express.json())
-app.use(userRouter)
-app.use(profileRouter)
+app.use(express.json());
+app.use(userRouter);
+app.use(profileRouter);
 
-app.use(bodyParser.urlencoded({extended: false}));
-
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`)
-})
+  console.log(`Server running on port ${port}`);
+});

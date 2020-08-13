@@ -60,6 +60,10 @@ const basicProfileSchema = mongoose.Schema({
       }
     },
   },
+  profilePhoto: {
+    data: Buffer,
+    contentType: String,
+  },
 });
 
 const BasicProfile = mongoose.model("BasicProfile", basicProfileSchema);

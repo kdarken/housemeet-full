@@ -2,13 +2,52 @@ const auth = require("../middleware/auth");
 const express = require("express");
 const BasicProfile = require("../models/BasicProfile");
 const HabitsProfile = require("../models/HabitsProfile");
+var fs = require("fs");
+var path = require("path");
+
+const multer = require("multer");
 
 const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.fieldname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 router.post("/profiles/update/basic", async (req, res) => {
   // Update user profile (basic information)
   try {
     console.log(req.body);
+
+    var obj = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      dateOfBirth: req.body.dateOfBirth,
+      lifeStyle: req.body.lifeStyle,
+      roommateOrHousemate: req.body.roommateOrHousemate,
+      bio: req.body.bio,
+      currentCity: req.body.currentCity,
+      budget: req.body.budget,
+      email: req.body.email,
+      profilePhoto: {
+        data: fs.readFileSync(
+          path.join(__dirname + "/uploads/" + req.file.filename)
+        ),
+        contentType: "image/png",
+      },
+    };
 
     const {
       firstName,
@@ -21,12 +60,13 @@ router.post("/profiles/update/basic", async (req, res) => {
       newCity,
       budget,
       email,
+      profilePhoto,
     } = req.body; //TODO fill in the foriegn inputs
 
-    let userProfile = await BasicProfile.findOne({ email });
+    let userProfile = await BasicProfile.findOne({ email: req.body.email });
     console.log(userProfile);
     if (!userProfile) {
-      userProfile = new BasicProfile(req.body);
+      userProfile = new BasicProfile(obj);
       userProfile.save();
     } else {
       //TODO
