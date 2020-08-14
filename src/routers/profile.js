@@ -43,18 +43,12 @@ router.post("/profiles/update/basic", async (req, res) => {
 router.post("/profiles/update/habits", async (req, res) => { //TODO: add auth
   // Update user profile (living habits)
   try {
-      console.log(req.body);
+      console.log(req.body)
       const { email, cleanScore, cleanScore2, guestScore, guestScore2, alcoholScore, alcoholScore2 } = req.body //TODO: how to clean this up
       let userProfile = await HabitsProfile.findOne({ email })
       console.log(userProfile)
       if (userProfile) {
-        userProfile.deleteOne({ email: email }, function(err, result) {
-          if (err) {
-            res.send(err)
-          } else {
-            
-          }
-        })
+        await userProfile.deleteOne({ email: email })
       }
       userProfile = new HabitsProfile(req.body)
       userProfile.save()
