@@ -2,6 +2,7 @@ const auth = require("../middleware/auth");
 const express = require("express");
 const BasicProfile = require("../models/BasicProfile");
 const HabitsProfile = require("../models/HabitsProfile");
+const User = require('../models/User');
 
 const router = express.Router();
 
@@ -39,29 +40,50 @@ router.post("/profiles/update/basic", async (req, res) => {
 });
 
 
-router.post("/profiles/update/habits", auth, async (req, res) => {
-    // Update user profile (living habits)
-    try {
-        console.log(req.body);
-        const { email, cleanScore, cleanScore2, guestScore, guestScore2, alcoholScore, alcoholScore2 } = req.body //TODO; how to clean this up
-        let userProfile = await HabitsProfile.findOne({ email })
-        console.log(userProfile)
-        if (!userProfile) {
-            userProfile = new HabitsProfile(req.body)
-            userProfile.save()
-        } else {
-            //TODO
-        }
-        res.status(201).send()
-    } catch (error) {
-        console.log(error)
-        res.status(400).send(error)
-    }
+router.post("/profiles/update/habits", async (req, res) => { //TODO: add auth
+  // Update user profile (living habits)
+  try {
+      console.log(req.body);
+      const { email, cleanScore, cleanScore2, guestScore, guestScore2, alcoholScore, alcoholScore2 } = req.body //TODO: how to clean this up
+      let userProfile = await HabitsProfile.findOne({ email })
+      console.log(userProfile)
+      if (userProfile) {
+        userProfile.deleteOne({ email: email }, function(err, result) {
+          if (err) {
+            res.send(err)
+          } else {
+            
+          }
+        })
+      }
+      userProfile = new HabitsProfile(req.body)
+      userProfile.save()
+      res.status(201).send()
+  } catch (error) {
+      console.log(error)
+      res.status(400).send(error)
+  }
 });
 
-router.get("/profiles/me", auth, async (req, res) => {
+router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
   // View logged in user profile
-  res.send(req.user);
+  let userId = req.params.userId
+  try {
+    let userProfile = await User.findOne({ name: userId }) //TODO: change collections so only need to check habitsProfile
+    let email = userProfile.email
+    console.log(email)
+    let habitsProfile = await HabitsProfile.findOne({ email })
+    //TODO: get other profile info
+    console.log(habitsProfile)
+    if (!habitsProfile) {
+      //TODO
+    } else {
+      res.send(habitsProfile)
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(400).send(error)
+  }
 });
 
-module.exports = router;
+module.exports = router
