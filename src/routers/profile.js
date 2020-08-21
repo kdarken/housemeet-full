@@ -61,6 +61,7 @@ router.post("/profiles/update/habits", async (req, res) => { //TODO: add auth
 
 router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
   // View logged in user profile
+  console.log("HEYYYY")
   let userId = req.params.userId
   try {
     let userProfile = await User.findOne({ name: userId }) //TODO: change collections so only need to check habitsProfile
@@ -73,6 +74,37 @@ router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
       //TODO
     } else {
       res.send(habitsProfile)
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(400).send(error)
+  }
+});
+
+router.get("/profiles/matches/:userId", async (req, res) => { //TODO: add auth
+  // View potential matches for user
+  let userId = req.params.userId
+  try {
+    let userProfile = await User.findOne({ name: userId }) //TODO: change collections so only need to check habitsProfile
+    let userEmail = userProfile.email
+    let habitsProfile = await HabitsProfile.findOne({ 'email' : userEmail })
+    console.log(habitsProfile)
+    if (!habitsProfile) {
+      //TODO
+    } else {
+      let currUserPref = await HabitsProfile.findOne({ 'email' : userEmail })
+      let agg = await HabitsProfile.aggregate([
+        {$match: {email: {$ne: userEmail}}},
+        {$project: {email: "$email", 
+                    cleanScore: "$cleanScore", 
+                    guestScore: "$guestScore",  
+                    alcoholScore: "$alcoholScore",
+                    diff: { $add: [  { $abs: { $subtract: [ "$cleanScore", currUserPref.cleanScore2 ] } }, 
+                                     { $abs: { $subtract: [ "$guestScore", currUserPref.guestScore2 ] } }, 
+                                     { $abs: { $subtract: [ "$alcoholScore", currUserPref.alcoholScore2 ] } } ] }}},
+        {$sort: {diff: 1}}]).limit(4);
+      console.log(agg.result)
+      res.send(agg.result)
     }
   } catch (error) {
     console.log(error)
