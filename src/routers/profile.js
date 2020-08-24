@@ -74,12 +74,15 @@ router.get("/profiles/:userId", async (req, res) => {
     let email = userProfile.email;
     console.log(email);
     let habitsProfile = await HabitsProfile.findOne({ email });
+    let basicProfile = await BasicProfile.findOne({ email });
     //TODO: get other profile info
     console.log(habitsProfile);
-    if (!habitsProfile) {
+    console.log(basicProfile);
+    if (!habitsProfile && !basicProfile) {
       //TODO
     } else {
-      res.send(habitsProfile);
+      //res.send(habitsProfile);
+      res.send([habitsProfile, basicProfile]);
     }
   } catch (error) {
     console.log(error);
