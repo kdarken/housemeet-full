@@ -61,7 +61,6 @@ router.post("/profiles/update/habits", async (req, res) => { //TODO: add auth
 
 router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
   // View logged in user profile
-  console.log("HEYYYY")
   let userId = req.params.userId
   try {
     let userProfile = await User.findOne({ name: userId }) //TODO: change collections so only need to check habitsProfile
@@ -83,18 +82,22 @@ router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
 
 router.get("/profiles/matches/:userId", async (req, res) => { //TODO: add auth
   // View potential matches for user
+  console.log("about to send potential matches")
   let userId = req.params.userId
   try {
     let userProfile = await User.findOne({ name: userId }) //TODO: change collections so only need to check habitsProfile
     let userEmail = userProfile.email
-    let habitsProfile = await HabitsProfile.findOne({ 'email' : userEmail })
-    console.log(habitsProfile)
-    if (!habitsProfile) {
+    let currUserInfo = await BasicProfile.findOne({ 'email' : userEmail })
+    let currUserPref = await HabitsProfile.findOne({ 'email' : userEmail })
+    if (!currUserInfo || !currUserPref) { //this will fail if user hasn't finished filling out both forms
       //TODO
     } else {
-      let currUserPref = await HabitsProfile.findOne({ 'email' : userEmail })
+      let users = await BasicProfile.distinct("email", 
+        {email: {$ne : userEmail}, 
+        newCity: {$eq: currUserInfo.newCity}});
       let agg = await HabitsProfile.aggregate([
-        {$match: {email: {$ne: userEmail}}},
+        {$match: {email: {$ne: userEmail},
+                  email: {$in: users}}},
         {$project: {email: "$email", 
                     cleanScore: "$cleanScore", 
                     guestScore: "$guestScore",  
@@ -103,8 +106,8 @@ router.get("/profiles/matches/:userId", async (req, res) => { //TODO: add auth
                                      { $abs: { $subtract: [ "$guestScore", currUserPref.guestScore2 ] } }, 
                                      { $abs: { $subtract: [ "$alcoholScore", currUserPref.alcoholScore2 ] } } ] }}},
         {$sort: {diff: 1}}]).limit(4);
-      console.log(agg.result)
-      res.send(agg.result)
+      //console.log(agg.map(function(el) { return el.email }))
+      res.send(agg.map(function(el) { return el.email }))
     }
   } catch (error) {
     console.log(error)
