@@ -60,7 +60,7 @@ router.post("/profiles/update/habits", async (req, res) => { //TODO: add auth
 });
 
 router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
-  // View logged in user profile
+  // View logged in user habits profile
   let userId = req.params.userId
   try {
     let userProfile = await User.findOne({ name: userId }) //TODO: change collections so only need to check habitsProfile
@@ -73,6 +73,25 @@ router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
       //TODO
     } else {
       res.send(habitsProfile)
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(400).send(error)
+  }
+});
+
+router.get("/profiles/email/:email", async (req, res) => { //TODO: use modified /profiles/:userId method instead once we stop iding users by email 
+  // View logged in user basic profile
+  let email = req.params.email + "@gmail.com"
+  console.log(email)
+  try {
+    let userProfile = await BasicProfile.findOne({ email }) //TODO: change collections so only need to check habitsProfile
+    //TODO: get other profile info
+    console.log(userProfile)
+    if (!userProfile) {
+      //TODO
+    } else {
+      res.send(userProfile)
     }
   } catch (error) {
     console.log(error)
