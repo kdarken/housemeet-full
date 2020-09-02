@@ -68,16 +68,9 @@ router.post("/profiles/update/habits", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
   // View logged in user habits profile
   let userId = req.params.userId
-=======
-router.get("/profiles/:userId", async (req, res) => {
-  //TODO: add auth
-  // View logged in user profile
-  let userId = req.params.userId;
->>>>>>> origin/socials
   try {
     let userProfile = await User.findOne({ name: userId }); //TODO: change collections so only need to check habitsProfile
     let email = userProfile.email;
