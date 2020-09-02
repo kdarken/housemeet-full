@@ -52,6 +52,36 @@ const basicProfileSchema = mongoose.Schema({
   email: {
     type: String,
     required: true,
+    trim: true,
+  },
+  gender: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  houseMateGender: {
+    type: Number,
+    required: true,
+    trim: true,
+  },
+  moveInDay: {
+    type: Date,
+    required: true,
+    trim: true,
+  },
+  numberInHome: {
+    type: Number,
+    required: true,
+    trim: true,
+  },
+  preferredNeighborhood: {
+    type: Number,
+    required: true,
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: true,
     unique: true,
     lowercase: true,
     validate: (value) => {

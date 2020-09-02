@@ -2,15 +2,13 @@ const auth = require("../middleware/auth");
 const express = require("express");
 const BasicProfile = require("../models/BasicProfile");
 const HabitsProfile = require("../models/HabitsProfile");
-const User = require('../models/User');
+const User = require("../models/User");
 
 const router = express.Router();
 
 router.post("/profiles/update/basic", async (req, res) => {
   // Update user profile (basic information)
   try {
-    console.log(req.body);
-
     const {
       firstName,
       lastName,
@@ -21,6 +19,9 @@ router.post("/profiles/update/basic", async (req, res) => {
       currentCity,
       newCity,
       budget,
+      moveInDay,
+      numberInHome,
+      preferredNeighborhood,
       email,
     } = req.body; //TODO fill in the foriegn inputs
 
@@ -39,44 +40,62 @@ router.post("/profiles/update/basic", async (req, res) => {
   }
 });
 
-
-router.post("/profiles/update/habits", async (req, res) => { //TODO: add auth
+router.post("/profiles/update/habits", async (req, res) => {
+  //TODO: add auth
   // Update user profile (living habits)
   try {
-      console.log(req.body)
-      const { email, cleanScore, cleanScore2, guestScore, guestScore2, alcoholScore, alcoholScore2 } = req.body //TODO: how to clean this up
-      let userProfile = await HabitsProfile.findOne({ email })
-      console.log(userProfile)
-      if (userProfile) {
-        await userProfile.deleteOne({ email: email })
-      }
-      userProfile = new HabitsProfile(req.body)
-      userProfile.save()
-      res.status(201).send()
+    console.log(req.body);
+    const {
+      email,
+      cleanScore,
+      cleanScore2,
+      guestScore,
+      guestScore2,
+      alcoholScore,
+      alcoholScore2,
+    } = req.body; //TODO: how to clean this up
+    let userProfile = await HabitsProfile.findOne({ email });
+    console.log(userProfile);
+    if (userProfile) {
+      await userProfile.deleteOne({ email: email });
+    }
+    userProfile = new HabitsProfile(req.body);
+    userProfile.save();
+    res.status(201).send();
   } catch (error) {
-      console.log(error)
-      res.status(400).send(error)
+    console.log(error);
+    res.status(400).send(error);
   }
 });
 
+<<<<<<< HEAD
 router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
   // View logged in user habits profile
   let userId = req.params.userId
+=======
+router.get("/profiles/:userId", async (req, res) => {
+  //TODO: add auth
+  // View logged in user profile
+  let userId = req.params.userId;
+>>>>>>> origin/socials
   try {
-    let userProfile = await User.findOne({ name: userId }) //TODO: change collections so only need to check habitsProfile
-    let email = userProfile.email
-    console.log(email)
-    let habitsProfile = await HabitsProfile.findOne({ email })
+    let userProfile = await User.findOne({ name: userId }); //TODO: change collections so only need to check habitsProfile
+    let email = userProfile.email;
+    console.log(email);
+    let habitsProfile = await HabitsProfile.findOne({ email });
+    let basicProfile = await BasicProfile.findOne({ email });
     //TODO: get other profile info
-    console.log(habitsProfile)
-    if (!habitsProfile) {
+    console.log(habitsProfile);
+    console.log(basicProfile);
+    if (!habitsProfile && !basicProfile) {
       //TODO
     } else {
-      res.send(habitsProfile)
+      //res.send(habitsProfile);
+      res.send([habitsProfile, basicProfile]);
     }
   } catch (error) {
-    console.log(error)
-    res.status(400).send(error)
+    console.log(error);
+    res.status(400).send(error);
   }
 });
 
