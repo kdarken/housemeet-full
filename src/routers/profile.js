@@ -19,6 +19,9 @@ router.post("/profiles/update/basic", async (req, res) => {
       currentCity,
       newCity,
       budget,
+      moveInDay,
+      numberInHome,
+      preferredNeighborhood,
       email,
     } = req.body; //TODO fill in the foriegn inputs
 
