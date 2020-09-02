@@ -49,18 +49,13 @@ const basicProfileSchema = mongoose.Schema({
     required: true,
     trim: true,
   },
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-  },
   gender: {
     type: String,
     required: true,
     trim: true,
   },
   houseMateGender: {
-    type: Number,
+    type: String,
     required: true,
     trim: true,
   },
@@ -74,8 +69,8 @@ const basicProfileSchema = mongoose.Schema({
     required: true,
     trim: true,
   },
-  preferredNeighborhood: {
-    type: Number,
+  preferredNeighborhoods: {
+    type: String,
     required: true,
     trim: true,
   },
