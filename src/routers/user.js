@@ -1,6 +1,7 @@
 const auth = require('../middleware/auth')
 const express = require('express')
 const User = require('../models/User')
+var ObjectID = require('mongodb').ObjectID;
 
 const router = express.Router()
 
@@ -8,6 +9,7 @@ router.post('/users/signup', async (req, res) => {
     // Create a new user
     try {
         console.log(req.body);
+        req.body.userId = new ObjectID();
         const user = new User(req.body)
         await user.save()
         const token = await user.generateAuthToken()

@@ -2,8 +2,14 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { ObjectId } = require("mongodb");
 
 const basicProfileSchema = mongoose.Schema({
+  userId: {
+    type: ObjectId,
+    required: true,
+    unique: true
+  },
   firstName: {
     type: String,
     required: true,

@@ -10,6 +10,7 @@ router.post("/profiles/update/basic", async (req, res) => {
   // Update user profile (basic information)
   try {
     const {
+      userId,
       firstName,
       lastName,
       dateOfBirth,
@@ -24,15 +25,13 @@ router.post("/profiles/update/basic", async (req, res) => {
       preferredNeighborhood,
       email,
     } = req.body; //TODO fill in the foriegn inputs
-
-    let userProfile = await BasicProfile.findOne({ email });
-    console.log(userProfile);
-    if (!userProfile) {
-      userProfile = new BasicProfile(req.body);
-      userProfile.save();
-    } else {
-      //TODO
+    let userProfile = await BasicProfile.findOne({ userId });
+    if (userProfile) {
+      await userProfile.deleteOne({ userId: userId });
     }
+    userProfile = new BasicProfile(req.body);
+    console.log(userProfile);
+    userProfile.save();
     res.status(201).send();
   } catch (error) {
     console.log(error);
@@ -44,8 +43,8 @@ router.post("/profiles/update/habits", async (req, res) => {
   //TODO: add auth
   // Update user profile (living habits)
   try {
-    console.log(req.body);
     const {
+      userId,
       email,
       cleanScore,
       cleanScore2,
@@ -54,12 +53,12 @@ router.post("/profiles/update/habits", async (req, res) => {
       alcoholScore,
       alcoholScore2,
     } = req.body; //TODO: how to clean this up
-    let userProfile = await HabitsProfile.findOne({ email });
-    console.log(userProfile);
+    let userProfile = await HabitsProfile.findOne({ userId });
     if (userProfile) {
-      await userProfile.deleteOne({ email: email });
+      await userProfile.deleteOne({ userId: userId });
     }
     userProfile = new HabitsProfile(req.body);
+    console.log(userProfile);
     userProfile.save();
     res.status(201).send();
   } catch (error) {
@@ -68,22 +67,19 @@ router.post("/profiles/update/habits", async (req, res) => {
   }
 });
 
-router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
-  // View logged in user habits profile
+router.get("/profiles/:userId", async (req, res) => { //TODO: add auth //TODO: change URL 
+  // View user habits profile
+  // beware of users only filling out one profile (or neither) and sending nulls over? or will this just error
   let userId = req.params.userId
   try {
-    let userProfile = await User.findOne({ name: userId }); //TODO: change collections so only need to check habitsProfile
-    let email = userProfile.email;
-    console.log(email);
-    let habitsProfile = await HabitsProfile.findOne({ email });
-    let basicProfile = await BasicProfile.findOne({ email });
+    let habitsProfile = await HabitsProfile.findOne({ userId });
+    let basicProfile = await BasicProfile.findOne({ userId });
     //TODO: get other profile info
     console.log(habitsProfile);
     console.log(basicProfile);
     if (!habitsProfile && !basicProfile) {
       //TODO
     } else {
-      //res.send(habitsProfile);
       res.send([habitsProfile, basicProfile]);
     }
   } catch (error) {
@@ -92,44 +88,24 @@ router.get("/profiles/:userId", async (req, res) => { //TODO: add auth
   }
 });
 
-router.get("/profiles/email/:email", async (req, res) => { //TODO: use modified /profiles/:userId method instead once we stop iding users by email 
-  // View logged in user basic profile
-  let email = req.params.email + "@gmail.com"
-  console.log(email)
-  try {
-    let userProfile = await BasicProfile.findOne({ email }) //TODO: change collections so only need to check habitsProfile
-    //TODO: get other profile info
-    console.log(userProfile)
-    if (!userProfile) {
-      //TODO
-    } else {
-      res.send(userProfile)
-    }
-  } catch (error) {
-    console.log(error)
-    res.status(400).send(error)
-  }
-});
-
 router.get("/profiles/matches/:userId", async (req, res) => { //TODO: add auth
   // View potential matches for user
   console.log("about to send potential matches")
   let userId = req.params.userId
   try {
-    let userProfile = await User.findOne({ name: userId }) //TODO: change collections so only need to check habitsProfile
-    let userEmail = userProfile.email
-    let currUserInfo = await BasicProfile.findOne({ 'email' : userEmail })
-    let currUserPref = await HabitsProfile.findOne({ 'email' : userEmail })
+    let currUserInfo = await BasicProfile.findOne({ userId })
+    let currUserPref = await HabitsProfile.findOne({ userId })
     if (!currUserInfo || !currUserPref) { //this will fail if user hasn't finished filling out both forms
       //TODO
     } else {
-      let users = await BasicProfile.distinct("email", 
-        {email: {$ne : userEmail}, 
+      let users = await BasicProfile.distinct("userId", 
+        {userId: {$ne : userId}, 
         newCity: {$eq: currUserInfo.newCity}});
       let agg = await HabitsProfile.aggregate([
-        {$match: {email: {$ne: userEmail},
-                  email: {$in: users}}},
-        {$project: {email: "$email", 
+        {$match: {userId: {$ne: userId},
+                  userId: {$in: users}}},
+        {$project: {userId: "$userId",
+                    email: "$email", 
                     cleanScore: "$cleanScore", 
                     guestScore: "$guestScore",  
                     alcoholScore: "$alcoholScore",
@@ -138,7 +114,7 @@ router.get("/profiles/matches/:userId", async (req, res) => { //TODO: add auth
                                      { $abs: { $subtract: [ "$alcoholScore", currUserPref.alcoholScore2 ] } } ] }}},
         {$sort: {diff: 1}}]).limit(4);
       //console.log(agg.map(function(el) { return el.email }))
-      res.send(agg.map(function(el) { return el.email }))
+      res.send(agg.map(function(el) { return el.userId }))
     }
   } catch (error) {
     console.log(error)

@@ -1,7 +1,14 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
+const { ObjectId } = require('mongodb')
 
 const habitsProfileSchema = mongoose.Schema({
+    userId: {
+        type: ObjectId,
+        required: true,
+        unique: true
+    },
+
     email: {
         type: String,
         required: true,

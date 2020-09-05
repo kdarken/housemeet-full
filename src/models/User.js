@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const { ObjectId } = require('mongodb')
 
 const userSchema = mongoose.Schema({
     name: {
@@ -9,6 +10,13 @@ const userSchema = mongoose.Schema({
         required: true,
         trim: true
     },
+
+    userId: {
+        type: ObjectId,
+        required: true,
+        unique: true
+    },
+
     email: {
         type: String,
         required: true,
