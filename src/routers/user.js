@@ -1,6 +1,7 @@
 const auth = require('../middleware/auth')
 const express = require('express')
 const User = require('../models/User')
+const UserRelations = require('../models/UserRelations')
 var ObjectID = require('mongodb').ObjectID;
 
 const router = express.Router()
@@ -58,6 +59,81 @@ router.post('/users/me/logoutall', auth, async(req, res) => {
         res.send()
     } catch (error) {
         res.status(500).send(error)
+    }
+})
+
+router.post('/users/:userId/likes', async (req, res) => {
+    // Add a user to liked users
+    try {
+        const {
+            likedUserId
+          } = req.body;
+        let currUserId = req.params.userId
+        let currUserRelations = await UserRelations.findOne({ userId: currUserId })
+        if (!currUserRelations) {
+            console.log("need to make new userRelations doc")
+            currUserRelations = new UserRelations({
+                userId: currUserId,
+                likedUsers: [ObjectID(likedUserId)],
+                dislikedUsers: [],
+                finalMatches: []
+            })
+            await currUserRelations.save()
+        } else {
+            await UserRelations.updateOne(
+                { userId: currUserId },
+                { $addToSet: { likedUsers: ObjectID(likedUserId) } }
+            )
+        }
+        /** If liked user has also liked curr user back, we have a match and must update both users' final matches */
+        let likedUserRelations = await UserRelations.findOne({ userId: likedUserId })
+        if (likedUserRelations && likedUserRelations.likedUsers.includes(currUserId)) {
+            await UserRelations.updateOne(
+                { userId: currUserId },
+                { $addToSet: { finalMatches: ObjectID(likedUserId) } }
+            )
+            await UserRelations.updateOne(
+                { userId: likedUserId },
+                { $addToSet: { finalMatches: ObjectID(currUserId) } }
+            )
+            console.log("updated user matches")
+        }
+        console.log("updated user likes")
+        res.status(201).send()
+    } catch (error) {
+        console.log(error)
+        res.status(400).send(error)
+    }
+})
+
+router.post('/users/:userId/dislikes', async (req, res) => {
+    // Add a user to disliked users
+    try {
+        const {
+            dislikedUserId
+          } = req.body;
+        let currUserId = req.params.userId
+        let currUserRelations = await UserRelations.findOne({ userId: currUserId })
+        if (!currUserRelations) {
+            console.log("need to make new userRelations doc")
+            currUserRelations = new UserRelations({
+                userId: currUserId,
+                likedUsers: [],
+                dislikedUsers: [ObjectID(dislikedUserId)],
+                finalMatches: []
+            })
+            await currUserRelations.save()
+        } else {
+            await UserRelations.updateOne(
+                { userId: currUserId },
+                { $addToSet: { dislikedUsers: ObjectID(dislikedUserId) } }
+            )
+        }
+        console.log("updated user dislikes")
+        res.status(201).send()
+    } catch (error) {
+        console.log(error)
+        res.status(400).send(error)
     }
 })
 

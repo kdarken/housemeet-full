@@ -3,6 +3,8 @@ const express = require("express");
 const BasicProfile = require("../models/BasicProfile");
 const HabitsProfile = require("../models/HabitsProfile");
 const User = require("../models/User");
+const UserRelations = require("../models/UserRelations");
+var ObjectID = require('mongodb').ObjectID;
 
 const router = express.Router();
 
@@ -95,15 +97,22 @@ router.get("/profiles/matches/:userId", async (req, res) => { //TODO: add auth
   try {
     let currUserInfo = await BasicProfile.findOne({ userId })
     let currUserPref = await HabitsProfile.findOne({ userId })
+    let currUserRelations = await UserRelations.findOne({ userId }) //what if this is null
     if (!currUserInfo || !currUserPref) { //this will fail if user hasn't finished filling out both forms
       //TODO
     } else {
       let users = await BasicProfile.distinct("userId", 
-        {userId: {$ne : userId}, 
-        newCity: {$eq: currUserInfo.newCity}});
+        {
+          userId: {$ne : userId, $nin: currUserRelations.likedUsers.concat(currUserRelations.dislikedUsers, currUserRelations.finalMatches)}, 
+          newCity: {$eq: currUserInfo.newCity},
+      });
+      console.log(users)
       let agg = await HabitsProfile.aggregate([
         {$match: {userId: {$ne: userId},
-                  userId: {$in: users}}},
+                  userId: {$in: users},
+                
+                  
+                }},
         {$project: {userId: "$userId",
                     email: "$email", 
                     cleanScore: "$cleanScore", 
