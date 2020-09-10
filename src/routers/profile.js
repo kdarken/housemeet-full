@@ -101,9 +101,13 @@ router.get("/profiles/matches/:userId", async (req, res) => { //TODO: add auth
     if (!currUserInfo || !currUserPref) { //this will fail if user hasn't finished filling out both forms
       //TODO
     } else {
+      let seenUsers = []
+      if (currUserRelations) {
+        seenUsers = currUserRelations.likedUsers.concat(currUserRelations.dislikedUsers, currUserRelations.finalMatches)
+      }
       let users = await BasicProfile.distinct("userId", 
         {
-          userId: {$ne : userId, $nin: currUserRelations.likedUsers.concat(currUserRelations.dislikedUsers, currUserRelations.finalMatches)}, 
+          userId: {$ne : userId, $nin: seenUsers}, 
           newCity: {$eq: currUserInfo.newCity},
       });
       console.log(users)
